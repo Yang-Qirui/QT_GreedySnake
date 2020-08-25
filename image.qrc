@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/image">
+        <file>image/bg.png</file>
+        <file>image/border.png</file>
+        <file>image/decoration1.png</file>
+        <file>image/head.png</file>
+        <file>image/food0.png</file>
+        <file>image/food1.png</file>
+        <file>image/food2.png</file>
+        <file>image/food3.png</file>
+        <file>image/food4.png</file>
+        <file>image/food5.png</file>
+        <file>image/food6.png</file>
+        <file>image/food7.png</file>
+        <file>image/food8.png</file>
+    </qresource>
+</RCC>
