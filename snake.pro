@@ -17,13 +17,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     gamewidget.cpp \
-    main.cpp
+    main.cpp \
+    mainwindow.cpp
 
 HEADERS += \
-    gamewidget.h
+    gamewidget.h \
+    mainwindow.h
 
 FORMS += \
-    gamewidget.ui
+    gamewidget.ui \
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -32,3 +35,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     image.qrc
+
+DISTFILES += \
+    MainWindow.qml \
+    MainWindowForm.ui.qml

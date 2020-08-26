@@ -4,23 +4,44 @@
 #include <QMainWindow>
 #include "gamewidget.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+signals:
 
 private slots:
+    void on__start_triggered();
 
+    void on__pause_triggered();
+
+    void on__save_triggered();
+
+    void on__continue_triggered();
+
+    void on__restart_triggered();
+
+    void on__load_triggered();
+
+    void on__quit_triggered();
+
+    void gameOverSlots();
+
+    void startGameSlots();
+
+    void pauseGameSlots();
+
+    void continueGameSlots();
+
+    void restartGameSlots();
 private:
     Ui::MainWindow *ui;
-    GameWidget* game=new GameWidget;
-    QPushButton* startButton;
 };
+
 #endif // MAINWINDOW_H

@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QFont>
 #include <QLineEdit>
+#include <QLCDNumber>
 
 #define MAX_X 40
 #define MAX_Y 40
@@ -50,12 +51,21 @@ public:
     void startGame();
     void pauseGame();
     void continueGame();
-    void gameOver();
-    void updateSnake();
     void enableCreate();
+    void saveGame();
+    void loadGame();
+    void restartGame();
+    void quitGame();
+    void gameOver();
 signals:
-    void resetButton();
+    void gameOverSignal();
+    void startGameSignal();
+    void pauseGameSignal();
+    void continueGameSignal();
+    void restartGameSignal();
 private:
+    int steps=0;
+    int scores=0;
     int foodCount=0;
     Ui::GameWidget *ui;
     Snake *map_label[MAX_X][MAX_Y];
@@ -66,16 +76,23 @@ private:
     Snake* tail;
     int dX,dY;
     QPushButton *_start;
+    QPushButton *_restart;
     QPushButton *_pause;
     QPushButton *_continue;
-    QPushButton *_createBorder;
+    QPushButton *_save;
+    QPushButton *_load;
+    QPushButton *_quit;
+    bool canCreat;
+    bool clicked[MAX_X][MAX_Y];
 public slots:
     void snakeMoveSlots();
     void startGameSlots();
     void pauseGameSlots();
     void continueGameSlots();
-    void enableCreateSlots();
-
+    void saveGameSlots();
+    void loadGameSlots();
+    void restartGameSlots();
+    void quitSlots();
 };
 
 #endif // GAMEWIDGET_H

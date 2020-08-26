@@ -1,25 +1,16 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "gamewidget.h"
-#include <QPushButton>
-#include <QDebug>
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    GameWidget* game=new GameWidget;
-    ui->gameLayout->addWidget(game);
-    ui->gridLayoutWidget->setFixedSize(MAX_X*Label_Size,MAX_Y*Label_Size);
-    this->setFixedSize((MAX_X+7)*Label_Size,(MAX_Y+1.5)*Label_Size);
-    QPushButton* startButton=new QPushButton("Start",this);
-    startButton->setGeometry((MAX_X+2)*Label_Size,Label_Size,80,60);
-    startButton->show();
-    QObject::connect(startButton,SIGNAL(clicked()),game,SLOT(startGameSlots()));
-    QObject::connect(startButton,SIGNAL(clicked()),startButton,SLOT(hide()));
-    QObject::connect(game,SIGNAL(resetButton()),startButton,SLOT(show()));
-    this->setFocusPolicy(Qt::NoFocus);
+    this->setFixedSize(1025,900);
+    ui->game->setParent(this);
+    QObject::connect(ui->game,SIGNAL(gameOverSignal()),this,SLOT(gameOverSlots()));
+    QObject::connect(ui->game,SIGNAL(startGameSignal()),this,SLOT(startGameSlots()));
+    QObject::connect(ui->game,SIGNAL(pauseGameSignal()),this,SLOT(pauseGameSlots()));
+    QObject::connect(ui->game,SIGNAL(continueGameSignal()),this,SLOT(continueGameSlots()));
+    QObject::connect(ui->game,SIGNAL(restartGameSignal()),this,SLOT(restartGameSlots()));
 }
 
 MainWindow::~MainWindow()
@@ -27,3 +18,93 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::on__start_triggered()
+{
+    ui->game->startGame();
+    ui->_start->setEnabled(false);
+    ui->_restart->setEnabled(false);
+    ui->_continue->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->_load->setEnabled(false);
+    ui->_pause->setEnabled(true);
+}
+
+void MainWindow::on__pause_triggered()
+{
+    ui->game->pauseGame();
+    ui->_save->setEnabled(true);
+    ui->_pause->setEnabled(false);
+    ui->_continue->setEnabled(true);
+    ui->_restart->setEnabled(true);
+}
+
+void MainWindow::on__save_triggered()
+{
+    ui->game->saveGame();
+}
+
+void MainWindow::on__continue_triggered()
+{
+    ui->game->continueGame();
+    ui->_continue->setEnabled(false);
+    ui->_pause->setEnabled(true);
+}
+
+void MainWindow::on__restart_triggered()
+{
+    ui->game->restartGame();
+    ui->_continue->setEnabled(false);
+    ui->_restart->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->_load->setEnabled(true);
+    ui->_start->setEnabled(true);
+}
+
+void MainWindow::on__load_triggered()
+{
+    ui->game->loadGame();
+    ui->_continue->setEnabled(true);
+}
+
+void MainWindow::on__quit_triggered()
+{
+    this->close();
+}
+
+void MainWindow::gameOverSlots(){
+    ui->_start->setEnabled(false);
+    ui->_pause->setEnabled(false);
+    ui->_continue->setEnabled(false);
+    ui->_load->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->_restart->setEnabled(true);
+}
+
+void MainWindow::startGameSlots(){
+    ui->_start->setEnabled(false);
+    ui->_restart->setEnabled(false);
+    ui->_continue->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->_load->setEnabled(false);
+    ui->_pause->setEnabled(true);
+}
+
+void MainWindow::pauseGameSlots(){
+    ui->_save->setEnabled(true);
+    ui->_pause->setEnabled(false);
+    ui->_continue->setEnabled(true);
+    ui->_restart->setEnabled(true);
+}
+
+void MainWindow::continueGameSlots(){
+    ui->_continue->setEnabled(false);
+    ui->_pause->setEnabled(true);
+}
+
+void MainWindow::restartGameSlots(){
+    ui->_continue->setEnabled(false);
+    ui->_restart->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->_load->setEnabled(true);
+    ui->_start->setEnabled(true);
+}
