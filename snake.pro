@@ -24,15 +24,22 @@ HEADERS += \
     gamewidget.h \
     mainwindow.h
 
-FORMS +=
+FORMS += \
+    gamewidget.ui \
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES +=
+RESOURCES += \
+    icon.qrc
 
 DISTFILES += \
     MainWindow.qml \
     MainWindowForm.ui.qml
+
+OTHER_FILES += myapp.rc
+
+RC_FILE += myapp.rc

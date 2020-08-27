@@ -33,13 +33,24 @@ private slots:
 
     void gameOverSlots();
 
-    void startGameSlots();
+    void on_start_clicked();
 
-    void pauseGameSlots();
+    void on_load_clicked();
 
-    void continueGameSlots();
+    void on_pause_clicked();
 
-    void restartGameSlots();
+    void on_con_clicked();
+
+    void on_restart_clicked();
+
+    void on_save_clicked();
+
+    void on_quit_clicked();
+
+    void displayStepSlots(int);
+
+    void displayScoreSlots(int);
+
 private:
     Ui::MainWindow *ui;
 };

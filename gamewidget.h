@@ -43,14 +43,14 @@ protected:
 public:
     explicit GameWidget(QWidget *parent = nullptr);
     ~GameWidget();
-    void initGame(int);
+    void initGame();
     void initBorder();
     void initSnake();
     void moveSnake();
     void createFood();
-    void startGame();
+    void startGame(int);
     void pauseGame();
-    void continueGame();
+    void continueGame(int);
     void enableCreate();
     void saveGame();
     void loadGame();
@@ -59,40 +59,22 @@ public:
     void gameOver();
 signals:
     void gameOverSignal();
-    void startGameSignal();
-    void pauseGameSignal();
-    void continueGameSignal();
-    void restartGameSignal();
+    void displayStepSignal(int);
+    void displayScoreSignal(int);
 private:
     int steps=0;
     int scores=0;
-    int foodCount=0;
     Ui::GameWidget *ui;
     Snake *map_label[MAX_X][MAX_Y];
-    int speed;
     QTimer timer;
     QList<Snake*> snake;
     Snake* head;
     Snake* tail;
     int dX,dY;
-    QPushButton *_start;
-    QPushButton *_restart;
-    QPushButton *_pause;
-    QPushButton *_continue;
-    QPushButton *_save;
-    QPushButton *_load;
-    QPushButton *_quit;
     bool canCreat;
     bool clicked[MAX_X][MAX_Y];
 public slots:
     void snakeMoveSlots();
-    void startGameSlots();
-    void pauseGameSlots();
-    void continueGameSlots();
-    void saveGameSlots();
-    void loadGameSlots();
-    void restartGameSlots();
-    void quitSlots();
 };
 
 #endif // GAMEWIDGET_H

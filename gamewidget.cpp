@@ -19,51 +19,15 @@ GameWidget::GameWidget(QWidget *parent) :
     ui(new Ui::GameWidget)
 {
     ui->setupUi(this);
-    this->setFixedSize((MAX_X+10)*Label_Size,(MAX_Y+1)*Label_Size);
-    _start=new QPushButton("Start",this);
-    _start->setGeometry((MAX_X+2)*Label_Size,Label_Size,160,60);
-    _start->setFocusPolicy(Qt::NoFocus);
-    _pause=new QPushButton("Pause",this);
-    _pause->setGeometry((MAX_X+2)*Label_Size,4.5*Label_Size,160,60);
-    _pause->setFocusPolicy(Qt::NoFocus);
-    _pause->setEnabled(false);
-    _continue=new QPushButton("Continue",this);
-    _continue->setGeometry((MAX_X+2)*Label_Size,8*Label_Size,160,60);
-    _continue->setFocusPolicy(Qt::NoFocus);
-    _continue->setEnabled(false);
-    _restart=new QPushButton("Restart",this);
-    _restart->setGeometry((MAX_X+2)*Label_Size,11.5*Label_Size,160,60);
-    _restart->setFocusPolicy(Qt::NoFocus);
-    _restart->setEnabled(false);
-    _save=new QPushButton("Save Game",this);
-    _save->setGeometry((MAX_X+2)*Label_Size,15*Label_Size,160,60);
-    _save->setFocusPolicy(Qt::NoFocus);
-    _save->setEnabled(false);
-    _load=new QPushButton("Load Game",this);
-    _load->setGeometry((MAX_X+2)*Label_Size,18.5*Label_Size,160,60);
-    _load->setFocusPolicy(Qt::NoFocus);
-    _quit=new QPushButton("Quit Game",this);
-    _quit->setGeometry((MAX_X+2)*Label_Size,22*Label_Size,160,60);
-    _quit->setFocusPolicy(Qt::NoFocus);
-    ui->lcd->display(0);
-    ui->lcd1->display(0);
-    initGame(75);
+    initGame();
     initBorder();
     initSnake();
     canCreat=true;
+    memset(clicked,true,sizeof (clicked));
     QObject::connect(&timer,SIGNAL(timeout()),this,SLOT(snakeMoveSlots()));
-    QObject::connect(_start,SIGNAL(clicked()),this,SLOT(startGameSlots()));
-    QObject::connect(_pause,SIGNAL(clicked()),this,SLOT(pauseGameSlots()));
-    QObject::connect(_continue,SIGNAL(clicked()),this,SLOT(continueGameSlots()));
-    QObject::connect(_save,SIGNAL(clicked()),this,SLOT(saveGameSlots()));
-    QObject::connect(_load,SIGNAL(clicked()),this,SLOT(loadGameSlots()));
-    QObject::connect(_restart,SIGNAL(clicked()),this,SLOT(restartGameSlots()));
-    QObject::connect(_quit,SIGNAL(clicked()),this,SLOT(quitSlots()));
 }
 
-void GameWidget::initGame(int moveSpeed){
-    foodCount=0;
-    speed=moveSpeed;
+void GameWidget::initGame(){
     steps=0;
     for (int x=0;x<MAX_X;x++){
         for (int y=0;y<MAX_Y;y++){
@@ -115,7 +79,7 @@ void GameWidget::initSnake(){
 
 void GameWidget::moveSnake(){
     steps++;
-    ui->lcd->display(steps);
+    emit displayStepSignal(steps);
     tail=snake.at(0);
     head=snake.at(snake.length()-1);
     Snake* tmp=map_label[head->x+dX][head->y+dY];
@@ -127,7 +91,7 @@ void GameWidget::moveSnake(){
     else{
         if (tmp->type==food_label){
             scores++;
-            ui->lcd1->display(scores);
+            emit displayScoreSignal(scores);
             tmp->type=snake_label;
             for (int i=0;i<3;i++) snake.append(tmp);
             createFood();
@@ -196,12 +160,12 @@ void GameWidget::mousePressEvent(QMouseEvent *e){
             axisY=pointer.y();
             int x=(axisX-10)/Label_Size;
             int y=(axisY-10)/Label_Size;
-            if (clicked[x][y]==false){
+            if (clicked[x][y]==true){
                 if (map_label[x][y]->type!=snake_label&&x!=MAX_X-1&&x!=0&&y!=MAX_Y-1&&y!=0){
                     map_label[x][y]->type=border_label;
                     map_label[x][y]->label->setStyleSheet("background:black");
                     map_label[x][y]->label->show();
-                    clicked[x][y]=true;
+                    clicked[x][y]=false;
                 }
              }
              else{
@@ -209,38 +173,31 @@ void GameWidget::mousePressEvent(QMouseEvent *e){
                     map_label[x][y]->type=bg_label;
                     map_label[x][y]->label->setStyleSheet("background:gray");
                     map_label[x][y]->label->hide();
-                    clicked[x][y]=false;
+                    clicked[x][y]=true;
                 }
             }
         }
     }
 }
 
-void GameWidget::startGame() {
+void GameWidget::startGame(int movespeed) {
     steps=0;
     scores=0;
     canCreat=false;
-    ui->lcd->display(steps);
-    ui->lcd1->display(scores);
+    emit displayStepSignal(steps);
+    emit displayScoreSignal(scores);
     initSnake();
     moveSnake();
     createFood();
-    timer.start(speed);
-    _start->setEnabled(false);
-    _restart->setEnabled(false);
-    _continue->setEnabled(false);
-    _save->setEnabled(false);
-    _load->setEnabled(false);
-    _pause->setEnabled(true);
-    emit startGameSignal();
+    timer.start(movespeed);
 }
 
 void GameWidget::restartGame(){
     canCreat=true;
     steps=0;
     scores=0;
-    ui->lcd->display(0);
-    ui->lcd1->display(0);
+    emit displayStepSignal(0);
+    emit displayScoreSignal(0);
     timer.stop();
     for(int x = 0; x < MAX_X; x++) {
         for(int y = 0; y < MAX_Y; y++) {
@@ -251,28 +208,14 @@ void GameWidget::restartGame(){
     }
     initSnake();
     initBorder();
-    _continue->setEnabled(false);
-    _restart->setEnabled(false);
-    _save->setEnabled(false);
-    _load->setEnabled(true);
-    _start->setEnabled(true);
-    emit restartGameSignal();
 }
 
 void GameWidget::pauseGame(){
     timer.stop();
-    _save->setEnabled(true);
-    _pause->setEnabled(false);
-    _continue->setEnabled(true);
-    _restart->setEnabled(true);
-    emit pauseGameSignal();
 }
 
-void GameWidget::continueGame(){
-    timer.start(75);
-    _continue->setEnabled(false);
-    _pause->setEnabled(true);
-    emit continueGameSignal();
+void GameWidget::continueGame(int movespeed){
+    timer.start(movespeed);
 }
 
 void GameWidget::gameOver(){
@@ -288,12 +231,6 @@ void GameWidget::gameOver(){
     initSnake();
     initBorder();
     timer.stop();
-    _start->setEnabled(false);
-    _pause->setEnabled(false);
-    _continue->setEnabled(false);
-    _load->setEnabled(false);
-    _save->setEnabled(false);
-    _restart->setEnabled(true);
     emit gameOverSignal();
 }
 
@@ -330,6 +267,7 @@ void GameWidget::saveGame(){
         bool opened=file.open(QIODevice::WriteOnly);
         if (opened){
             file.write(info.toUtf8().data());
+            QMessageBox::information(this,"Finished!","Save Successfully",QMessageBox::Ok);
         }
         file.close();
     }
@@ -386,12 +324,9 @@ void GameWidget::loadGame(){
             if (snake[snake.length()-1]->x==snake[snake.length()-2]->x&&snake[snake.length()-1]->y<snake[snake.length()-2]->y) {dX=0;dY=-1;qDebug()<<"up";}
             if (snake[snake.length()-1]->x>snake[snake.length()-2]->x&&snake[snake.length()-1]->y==snake[snake.length()-2]->y) {dX=1;dY=0;qDebug()<<"right";}
             if (snake[snake.length()-1]->x<snake[snake.length()-2]->x&&snake[snake.length()-1]->y==snake[snake.length()-2]->y) {dX=-1;dY=0;qDebug()<<"left";}
-            for (int i=0;i<snake.length();i++){
-                qDebug()<<"snake:"<<i<<" "<<snake[i]->x<<" "<<snake[i]->y;
-            }
-            ui->lcd->display(steps);
-            ui->lcd1->display(scores);
-            _continue->setEnabled(true);
+            emit displayStepSignal(steps);
+            emit displayScoreSignal(scores);
+            QMessageBox::information(this,"Finished!","Load Successfully",QMessageBox::Ok);
         }
         file.close();
     }
@@ -404,27 +339,6 @@ void GameWidget::quitGame(){
 
 void GameWidget::snakeMoveSlots(){
     moveSnake();
-}
-void GameWidget::startGameSlots(){
-    startGame();
-}
-void GameWidget::pauseGameSlots(){
-    pauseGame();
-}
-void GameWidget::continueGameSlots(){
-    continueGame();
-}
-void GameWidget::saveGameSlots(){
-    saveGame();
-}
-void GameWidget::loadGameSlots(){
-    loadGame();
-}
-void GameWidget::restartGameSlots(){
-    restartGame();
-}
-void GameWidget::quitSlots(){
-    quitGame();
 }
 GameWidget::~GameWidget()
 {
