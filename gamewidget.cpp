@@ -24,6 +24,8 @@ GameWidget::GameWidget(QWidget *parent) :
     initSnake();
     canCreat=true;
     memset(clicked,true,sizeof (clicked));
+    pressed=false;
+    canMove=false;
     QObject::connect(&timer,SIGNAL(timeout()),this,SLOT(snakeMoveSlots()));
 }
 
@@ -71,10 +73,11 @@ void GameWidget::initSnake(){
     snake.clear();
     for (int i=0;i<snakelen;i++){
         map_label[initX+i][initY]->type=snake_label;
-        map_label[initX+i][initY]->label->setStyleSheet("background:green");
+        map_label[initX+i][initY]->label->setStyleSheet("background:green;border:1px solid rgb(240,240,240)");
         map_label[initX+i][initY]->label->show();
         snake.append(map_label[initX+i][initY]);
     }
+    snake[snake.length()-1]->label->setStyleSheet("background:green;border-radius:"+QString::number(Label_Size/2));
 }
 
 void GameWidget::moveSnake(){
@@ -83,7 +86,8 @@ void GameWidget::moveSnake(){
     tail=snake.at(0);
     head=snake.at(snake.length()-1);
     Snake* tmp=map_label[head->x+dX][head->y+dY];
-    tmp->label->setStyleSheet("background:green");
+    head->label->setStyleSheet("background:green;border:1px solid rgb(240,240,240)");
+    tmp->label->setStyleSheet("background:green;border-radius:"+QString::number(Label_Size/2));
     tmp->label->show();
     if (tmp->type==border_label||tmp->type==snake_label){
         gameOver();
@@ -118,35 +122,44 @@ void GameWidget::createFood(){
 }
 
 void GameWidget::keyPressEvent(QKeyEvent *e) {
+   if (canMove){
     switch(e->key()) {
-
     case Qt::Key_Left:
-        if(dX == 0){
+        if(dX != -1){
             dX = -1;
             dY = 0;
         }
         break;
     case Qt::Key_Right:
-        if(dX == 0){
+        if (!pressed){
+            timer.start(speed);
+            pressed=true;
+        }
+        if(dX != 1){
             dX = 1;
             dY = 0;
         }
         break;
     case Qt::Key_Up:
-        if(dY == 0){
+        if(dY != -1){
             dX = 0;
             dY = -1;
+            if (!pressed)timer.start(speed);
+            pressed=true;
             }
         break;
     case Qt::Key_Down:
-        if(dY == 0){
+        if(dY != 1){
             dX = 0;
             dY = 1;
+            if (!pressed)timer.start(speed);
+            pressed=true;
             }
         break;
     default:
         break;
     }
+   }
 }
 
 void GameWidget::mousePressEvent(QMouseEvent *e){
@@ -180,16 +193,17 @@ void GameWidget::mousePressEvent(QMouseEvent *e){
     }
 }
 
-void GameWidget::startGame(int movespeed) {
+void GameWidget::startGame(double movespeed) {
     steps=0;
     scores=0;
     canCreat=false;
+    canMove=true;
+    speed=movespeed;
     emit displayStepSignal(steps);
     emit displayScoreSignal(scores);
     initSnake();
-    moveSnake();
+//    moveSnake();
     createFood();
-    timer.start(movespeed);
 }
 
 void GameWidget::restartGame(){
@@ -214,7 +228,7 @@ void GameWidget::pauseGame(){
     timer.stop();
 }
 
-void GameWidget::continueGame(int movespeed){
+void GameWidget::continueGame(double movespeed){
     timer.start(movespeed);
 }
 
@@ -228,6 +242,8 @@ void GameWidget::gameOver(){
             clicked[x][y]=false;
         }
     }
+    canMove=false;
+    pressed=false;
     initSnake();
     initBorder();
     timer.stop();
@@ -301,11 +317,12 @@ void GameWidget::loadGame(){
             for (int i=0;i<snakelist.length()-1;i+=2){
                 if (snakelist[i]!="\n"&&snakelist[i]!=" "){
                     map_label[snakelist[i].toInt()][snakelist[i+1].toInt()]->type=snake_label;
-                    map_label[snakelist[i].toInt()][snakelist[i+1].toInt()]->label->setStyleSheet("background:green");
+                    map_label[snakelist[i].toInt()][snakelist[i+1].toInt()]->label->setStyleSheet("background:green;border:1px solid rgb(240,240,240)");
                     map_label[snakelist[i].toInt()][snakelist[i+1].toInt()]->label->show();
                     snake.push_back(map_label[snakelist[i].toInt()][snakelist[i+1].toInt()]);
                 }
             }
+            snake[snake.length()-1]->label->setStyleSheet("background:green;border-radius:"+QString::number(Label_Size/2));
             for (int i=0;i<borderlist.length()-1;i+=2){
                 if (borderlist[i]!="\n"&&borderlist[i]!=" "){
                     map_label[borderlist[i].toInt()][borderlist[i+1].toInt()]->type=border_label;

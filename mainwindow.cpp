@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QIcon>
+#include <QtMath>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWindow)
 {
@@ -9,6 +10,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent),ui(new Ui::MainWin
     this->setWindowTitle("Yqr's Greedy Snake");
     this->setWindowIcon(QIcon(":/icon/icon/57994126.png"));
     ui->game->setParent(this);
+    ui->_pause->setEnabled(false);
+    ui->_continue->setEnabled(false);
+    ui->_restart->setEnabled(false);
+    ui->_save->setEnabled(false);
+    ui->pause->setEnabled(false);
+    ui->con->setEnabled(false);
+    ui->restart->setEnabled(false);
+    ui->save->setEnabled(false);
     ui->lcd->display(0);
     ui->lcd1->display(0);
     QObject::connect(ui->game,SIGNAL(gameOverSignal()),this,SLOT(gameOverSlots()));
@@ -25,7 +34,7 @@ void MainWindow::on__start_triggered()
 {
     int speed= ui->speed->value();
     ui->speed->setEnabled(false);
-    ui->game->startGame((10-speed)*50);
+    ui->game->startGame(qLn(10.5-speed)*50);
     ui->_start->setEnabled(false);
     ui->_restart->setEnabled(false);
     ui->_continue->setEnabled(false);
@@ -61,7 +70,7 @@ void MainWindow::on__save_triggered()
 void MainWindow::on__continue_triggered()
 {
     int speed= ui->speed->value();
-    ui->game->continueGame(speed);
+    ui->game->continueGame(qLn(10.5-speed)*50);
     ui->_continue->setEnabled(false);
     ui->_pause->setEnabled(true);
     ui->con->setEnabled(false);
@@ -115,7 +124,7 @@ void MainWindow::on_start_clicked()
 {
     int speed= ui->speed->value();
     ui->speed->setEnabled(false);
-    ui->game->startGame((10-speed)*50);
+    ui->game->startGame(qLn(10.5-speed)*50);
     ui->_start->setEnabled(false);
     ui->_restart->setEnabled(false);
     ui->_continue->setEnabled(false);
@@ -153,7 +162,7 @@ void MainWindow::on_pause_clicked()
 void MainWindow::on_con_clicked()
 {
     int speed= ui->speed->value();
-    ui->game->continueGame(speed);
+    ui->game->continueGame(qLn(10.5-speed)*50);
     ui->_continue->setEnabled(false);
     ui->_pause->setEnabled(true);
     ui->con->setEnabled(false);

@@ -48,9 +48,9 @@ public:
     void initSnake();
     void moveSnake();
     void createFood();
-    void startGame(int);
+    void startGame(double);
     void pauseGame();
-    void continueGame(int);
+    void continueGame(double);
     void enableCreate();
     void saveGame();
     void loadGame();
@@ -64,6 +64,7 @@ signals:
 private:
     int steps=0;
     int scores=0;
+    double speed;
     Ui::GameWidget *ui;
     Snake *map_label[MAX_X][MAX_Y];
     QTimer timer;
@@ -73,6 +74,8 @@ private:
     int dX,dY;
     bool canCreat;
     bool clicked[MAX_X][MAX_Y];
+    bool pressed;
+    bool canMove;
 public slots:
     void snakeMoveSlots();
 };
